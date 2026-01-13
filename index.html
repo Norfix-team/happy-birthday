@@ -192,63 +192,7 @@
       font-size: 11px;
     }
 
-    /* جانب الصورة والهدية */
-    .visual-side {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
-    }
-
-    .photo-frame {
-      position: relative;
-      width: 100%;
-      max-width: 280px;
-      aspect-ratio: 3 / 4;
-      border-radius: 24px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #ff6cab 0%, #6c5ce7 100%);
-      padding: 3px;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7);
-    }
-
-    .photo-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 21px;
-      overflow: hidden;
-      background: radial-gradient(circle at top, #14192f, #050814);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .photo-inner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.97;
-      transform: scale(1.03);
-    }
-
-    .photo-placeholder {
-      text-align: center;
-      padding: 14px;
-      font-size: 13px;
-      opacity: 0.8;
-    }
-
-    .photo-placeholder span {
-      display: block;
-      margin-top: 6px;
-      font-size: 11px;
-      opacity: 0.7;
-    }
-
-    /* بوكس الهدية */
+    /* جانب الهدية */
     .gift-container {
       position: relative;
       display: flex;
@@ -391,7 +335,6 @@
   <div class="glow-circle g2"></div>
   <div class="glow-circle g3"></div>
 
-  <!-- نجوم عشوائية (نضيفها بالسكريبت) -->
   <!-- كانفس للقصاصات -->
   <canvas id="confettiCanvas"></canvas>
 
@@ -420,7 +363,7 @@
         <div class="name-highlight">
           منار ❤️
         </div>
-        
+
         <p class="message">
           كل سنة وأنت أقرب لقلبي، وأسعد شخص على هالكوكب.  
           وجودك لحاله عيد، وضحكتك لحالها حياة ثانية.  
@@ -434,25 +377,24 @@
         </ul>
       </div>
 
-        <!-- الهدية -->
-        <div class="gift-container">
-          <div class="gift-box" id="giftBox">
-            <div class="gift-base"></div>
-            <div class="gift-lid">
-              <div class="ribbon-knot"></div>
-            </div>
+      <!-- الهدية -->
+      <div class="gift-container">
+        <div class="gift-box" id="giftBox">
+          <div class="gift-base"></div>
+          <div class="gift-lid">
+            <div class="ribbon-knot"></div>
           </div>
-          <div class="gift-label">اضغط على الهدية عشان تشوف الرسالة الخاصة 🎁</div>
-          <div class="gift-hint">(اضغط أكثر من مرة لو حاب تشغل القصاصات من جديد)</div>
-
-          <p class="hidden-message" id="hiddenMessage">
-            الرسالة السرّية لك أنت بس 💌  
-            مهما قلت من كلام بيبقى قليل عليك،  
-            بس الشي الأكيد أني ممتن لوجودك في حياتي،  
-            ومهما تغيّر كل شيء حولي…  
-            وجودك هو الثابت الأجمل. 🤍
-          </p>
         </div>
+        <div class="gift-label">اضغط على الهدية عشان تشوف الرسالة الخاصة 🎁</div>
+        <div class="gift-hint">(اضغط أكثر من مرة لو حاب تشغل القصاصات من جديد)</div>
+
+        <p class="hidden-message" id="hiddenMessage">
+          الرسالة السرّية لك أنت بس 💌  
+          مهما قلت من كلام بيبقى قليل عليك،  
+          بس الشي الأكيد أني ممتن لوجودك في حياتي،  
+          ومهما تغيّر كل شيء حولي…  
+          وجودك هو الثابت الأجمل. 🤍
+        </p>
       </div>
     </article>
   </main>
@@ -479,6 +421,7 @@
     const hiddenMessage = document.getElementById("hiddenMessage");
 
     let confettiRunning = false;
+    let confettiFading = false;
 
     // ========== تفعيل البداية ==========
     startBtn.addEventListener("click", () => {
@@ -498,7 +441,7 @@
       startConfetti();
       setTimeout(() => stopConfetti(), 2000);
 
-      // لو حاب تضيف موسيقى، حط ملف mp3 بجانب الصفحة واستعمل السطرين تحت:
+      // موسيقى (اختياري)
       /*
       const audio = new Audio("happy-birthday.mp3");
       audio.volume = 0.8;
@@ -515,7 +458,7 @@
       if (giftOpened) {
         hiddenMessage.classList.add("show");
         startConfetti();
-        setTimeout(() => stopConfetti(), 2500);
+        setTimeout(() => stopConfetti(), 7000);
       } else {
         hiddenMessage.classList.remove("show");
       }
@@ -534,9 +477,19 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
+    // تحويل HEX إلى RGB لاستخدامه مع الشفافية
+    function hexToRgb(hex) {
+      const bigint = parseInt(hex.slice(1), 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `${r}, ${g}, ${b}`;
+    }
+
     function createConfetti() {
       const colors = ["#ff6cab", "#ff9a44", "#ffeaa7", "#6c5ce7", "#55efc4"];
       const pieces = [];
+      // عدد أقل شوي
       for (let i = 0; i < 160; i++) {
         pieces.push({
           x: Math.random() * canvas.width,
@@ -544,10 +497,12 @@
           w: 6 + Math.random() * 5,
           h: 12 + Math.random() * 6,
           color: colors[Math.floor(Math.random() * colors.length)],
-          speedY: 2 + Math.random() * 4,
+          speedY: 1 + Math.random() * 2.2,
           speedX: -1 + Math.random() * 2,
           rotation: Math.random() * 360,
-          rotationSpeed: -6 + Math.random() * 12
+          rotationSpeed: -4 + Math.random() * 8,
+          alpha: 1,
+          fadeSpeed: 0.01 + Math.random() * 0.015
         });
       }
       return pieces;
@@ -555,11 +510,14 @@
 
     function drawConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      confettiPieces.forEach((p) => {
+
+      for (let i = confettiPieces.length - 1; i >= 0; i--) {
+        const p = confettiPieces[i];
+
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate((p.rotation * Math.PI) / 180);
-        ctx.fillStyle = p.color;
+        ctx.fillStyle = `rgba(${hexToRgb(p.color)}, ${p.alpha})`;
         ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
         ctx.restore();
 
@@ -567,25 +525,45 @@
         p.x += p.speedX;
         p.rotation += p.rotationSpeed;
 
-        if (p.y > canvas.height + 20) {
-          p.y = -20;
-          p.x = Math.random() * canvas.width;
+        if (confettiFading) {
+          // وقت التلاشي
+          p.alpha -= p.fadeSpeed;
+          if (p.alpha <= 0) {
+            confettiPieces.splice(i, 1);
+            continue;
+          }
+        } else {
+          // عادة نسوي إعادة ضبط لو طلعت برا الشاشة
+          if (p.y > canvas.height + 20) {
+            p.y = -20;
+            p.x = Math.random() * canvas.width;
+          }
         }
-      });
+      }
+
+      // إذا كنا في وضع التلاشي وخلصت القطع، نوقّف الرسمة
+      if (confettiFading && confettiPieces.length === 0) {
+        confettiRunning = false;
+        confettiFading = false;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        cancelAnimationFrame(animationId);
+        return;
+      }
+
       animationId = requestAnimationFrame(drawConfetti);
     }
 
     function startConfetti() {
       if (confettiRunning) return;
       confettiRunning = true;
+      confettiFading = false;
       confettiPieces = createConfetti();
       drawConfetti();
     }
 
     function stopConfetti() {
-      confettiRunning = false;
-      cancelAnimationFrame(animationId);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // بدل ما نوقف فجأة نخليها تتلاشى
+      confettiFading = true;
     }
   </script>
 </body>
